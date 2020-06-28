@@ -1,13 +1,10 @@
+require('dotenv').config();
 import express, { Application } from 'express';
 import { ApolloServer } from 'apollo-server-express';
 import { typeDefs, resolvers } from './graphql';
 import connectDatabase from './database';
-import dotenv from 'dotenv';
-import { Listing } from './lib/types';
 // import { schema } from './graphql';
 // import bodyParser from 'body-parser';
-
-dotenv.config();
 
 // const app = express();
 // // app.use(bodyParser.json());
@@ -26,7 +23,7 @@ const mount = async (app: Application) => {
   const server = new ApolloServer({ typeDefs, resolvers, context: () => ({ db }) });
   server.applyMiddleware({ app, path: '/api' });
 
-  app.listen(port, () => console.log(`Server started at port:${port}`));
+  app.listen(port, () => console.log(`Server started at port:${process.env.PORT}`));
 
   // const listings = await db.listings.find({}).toArray();
   // console.log(listings);

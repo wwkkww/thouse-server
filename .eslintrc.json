@@ -10,6 +10,8 @@
     "indent": "off",
     "@typescript-eslint/indent": "off",
     // disable the requirement of a return type in functions.
-    "@typescript-eslint/explicit-return-type": "off"
+    "@typescript-eslint/explicit-return-type": "off",
+    // disable Require statement not part of import statement.
+    "@typescript-eslint/no-var-requires": 0
   }
 }
