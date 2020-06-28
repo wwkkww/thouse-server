@@ -1,5 +1,6 @@
 import { MongoClient } from 'mongodb';
 import dotenv from 'dotenv';
+import { Database } from '../lib/types';
 
 dotenv.config();
 
@@ -9,7 +10,7 @@ const CLUSTER = process.env.MONGO_CLUSTER;
 
 const MONGO_URL = `mongodb+srv://${USER}:${PASSWORD}@${CLUSTER}.mongodb.net/TinyHouse?retryWrites=true&w=majority`;
 
-const connectDatabase = async () => {
+const connectDatabase = async (): Promise<Database> => {
   const client = await MongoClient.connect(MONGO_URL, {
     useNewUrlParser: true,
     useUnifiedTopology: true,

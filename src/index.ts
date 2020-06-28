@@ -3,6 +3,7 @@ import { ApolloServer } from 'apollo-server-express';
 import { typeDefs, resolvers } from './graphql';
 import connectDatabase from './database';
 import dotenv from 'dotenv';
+import { Listing } from './lib/types';
 // import { schema } from './graphql';
 // import bodyParser from 'body-parser';
 
@@ -26,6 +27,9 @@ const mount = async (app: Application) => {
   server.applyMiddleware({ app, path: '/api' });
 
   app.listen(port, () => console.log(`Server started at port:${port}`));
+
+  // const listings = await db.listings.find({}).toArray();
+  // console.log(listings);
 };
 
 mount(express());
