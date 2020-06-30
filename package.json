@@ -7,6 +7,7 @@
     "start": "nodemon src/index.ts",
     "build": "tsc --project ./",
     "seed": "ts-node src/temp/seed.ts",
+    "clear": "ts-node src/temp/clear.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
