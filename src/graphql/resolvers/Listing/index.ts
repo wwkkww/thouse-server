@@ -6,6 +6,7 @@ import { ObjectId } from 'mongodb';
 export const listingResolvers: IResolvers = {
   Query: {
     listings: async (_root: undefined, _args: {}, { db }: { db: Database }): Promise<Listing[]> => {
+      // throw new Error('Error from fetch listing');
       return await db.listings.find({}).toArray();
     },
   },
