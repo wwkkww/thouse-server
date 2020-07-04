@@ -669,6 +669,7 @@ const listings: Listing[] = [
     numOfGuests: 1,
   },
 ];
+
 const users: User[] = [
   {
     _id: '5d378db94e84753160e08b55',
