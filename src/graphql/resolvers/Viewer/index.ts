@@ -3,11 +3,20 @@ import { IResolvers } from 'apollo-server-express';
 import { Viewer, Database, User } from '../../../lib/types';
 import { Google } from '../../../lib/api';
 import { LoginArgs } from './types';
+import { Response, Request } from 'express';
+
+const cookieOptions = {
+  httpOnly: true,
+  sameSite: true,
+  signed: true,
+  secure: process.env.NODE_ENV === 'development' ? false : true,
+};
 
 const loginViaGoogle = async (
   code: string,
   token: string,
-  db: Database
+  db: Database,
+  response: Response
 ): Promise<User | undefined> => {
   const { user } = await Google.login(code);
 
@@ -64,6 +73,30 @@ const loginViaGoogle = async (
     });
     viewer = insertRes.ops[0];
   }
+  response.cookie('viewer', userId, {
+    ...cookieOptions,
+    maxAge: 30 * 24 * 60 * 60 * 1000,
+  });
+  return viewer;
+};
+
+const loginViaCookie = async (
+  token: string,
+  db: Database,
+  req: Request,
+  res: Response
+): Promise<User | undefined> => {
+  const updateRes = await db.users.findOneAndUpdate(
+    { _id: req.signedCookies.viewer },
+    { $set: { token } },
+    { returnOriginal: false }
+  );
+
+  const viewer = updateRes.value;
+
+  if (!viewer) {
+    res.clearCookie('viewer', cookieOptions);
+  }
 
   return viewer;
 };
@@ -82,13 +115,15 @@ export const viewerResolvers: IResolvers = {
     login: async (
       _root: undefined,
       { input }: LoginArgs,
-      { db }: { db: Database }
+      { db, req, res }: { db: Database; req: Request; res: Response }
     ): Promise<Viewer> => {
       try {
         const code = input ? input.code : null;
         const token = crypto.randomBytes(16).toString('hex');
 
-        const viewer: User | undefined = code ? await loginViaGoogle(code, token, db) : undefined;
+        const viewer: User | undefined = code
+          ? await loginViaGoogle(code, token, db, res)
+          : await loginViaCookie(token, db, req, res);
 
         if (!viewer) {
           return { didRequest: true };
@@ -105,8 +140,9 @@ export const viewerResolvers: IResolvers = {
         throw new Error(`Failed to login ${error}`);
       }
     },
-    logout: (): Viewer => {
+    logout: (_root: undefined, _args: {}, { res }: { res: Response }): Viewer => {
       try {
+        res.clearCookie('viewer', cookieOptions);
         return { didRequest: true };
       } catch (error) {
         throw new Error('Failed to logout: ' + error);
