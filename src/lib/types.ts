@@ -62,6 +62,7 @@ export interface User {
   income: number;
   bookings: ObjectId[]; //one-to-many
   listings: ObjectId[]; //one-to-many
+  authorized?: boolean;
 }
 
 export interface Database {
